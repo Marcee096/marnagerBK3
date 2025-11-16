@@ -5,9 +5,6 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
 -- Schema marnager
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `marnager` ;
@@ -37,7 +34,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `marnager`.`gasto` ;
 
 CREATE TABLE IF NOT EXISTS `marnager`.`gasto` (
-  `idgasto` INT NOT NULL,
+  `idgasto` INT NOT NULL AUTO_INCREMENT,
   `categoria` VARCHAR(45) NOT NULL,
   `subcategoria` VARCHAR(45) NULL,
   `fecha` DATE NOT NULL,
@@ -81,7 +78,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `marnager`.`ahorro` ;
 
 CREATE TABLE IF NOT EXISTS `marnager`.`ahorro` (
-  `idahorro` INT NOT NULL,
+  `idahorro` INT NOT NULL AUTO_INCREMENT,
   `categoria` VARCHAR(45) NOT NULL,
   `subcategoria` VARCHAR(45) NULL,
   `fecha` DATE NOT NULL,

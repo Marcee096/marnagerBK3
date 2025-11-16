@@ -224,138 +224,474 @@
             <p>Registra y categoriza todos tus gastos para un mejor control</p>
         </div>
 
-        <!-- Mensaje de éxito -->
-        <c:if test="${param.status == 'success'}">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle"></i>
-                <strong>¡Éxito!</strong> El gasto ha sido guardado correctamente.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </c:if>
+                <!-- Mensajes de estado -->
 
-        <div class="row">
-            <!-- Formulario para añadir gastos -->
-            <div class="col-lg-5 col-md-12">
-                <div class="card">
-                    <div class="card-header-custom">
-                        <i class="fas fa-plus-circle"></i> Registrar Nuevo Gasto
+                <c:if test="${param.status == 'created'}">
+
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+                        <i class="fas fa-check-circle"></i>
+
+                        <strong>¡Éxito!</strong> El gasto ha sido guardado correctamente.
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
                     </div>
-                    <div class="card-body-custom">
-                        <form action="${pageContext.request.contextPath}/gastos" method="post">
-                            <div class="mb-3">
-                                <label for="categoria" class="form-label">
-                                    <i class="fas fa-folder"></i> Categoría
-                                </label>
-                                <select class="form-select" id="categoria" name="categoria" required>
-                                    <option value="">Seleccione una categoría</option>
-                                    <option value="Vivienda">Vivienda</option>
-                                    <option value="Alimentación">Alimentación</option>
-                                    <option value="Transporte">Transporte</option>
-                                    <option value="Ocio">Ocio</option>
-                                    <option value="Salud">Salud</option>
-                                    <option value="Educación">Educación</option>
-                                    <option value="Ropa">Ropa</option>
-                                    <option value="Otros">Otros</option>
-                                </select>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="subcategoria" class="form-label">
-                                    <i class="fas fa-folder-open"></i> Subcategoría/Descripción
-                                </label>
-                                <input type="text" class="form-control" id="subcategoria" name="subcategoria" 
-                                       placeholder="Ej: Supermercado, Factura de luz, etc." required>
-                            </div>
+                </c:if>
 
-                            <div class="mb-3">
-                                <label for="monto" class="form-label">
-                                    <i class="fas fa-dollar-sign"></i> Monto
-                                </label>
-                                <input type="number" class="form-control" id="monto" name="monto" 
-                                       step="0.01" placeholder="0.00" required>
-                            </div>
+                <c:if test="${param.status == 'updated'}">
 
-                            <div class="mb-3">
-                                <label for="fecha" class="form-label">
-                                    <i class="fas fa-calendar"></i> Fecha
-                                </label>
-                                <input type="date" class="form-control" id="fecha" name="fecha" required>
-                            </div>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
 
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-plus"></i> Añadir Gasto
-                            </button>
-                        </form>
+                        <i class="fas fa-check-circle"></i>
+
+                        <strong>¡Éxito!</strong> El gasto ha sido actualizado correctamente.
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
                     </div>
-                </div>
-            </div>
 
-            <!-- Tabla de gastos -->
-            <div class="col-lg-7 col-md-12">
-                <div class="card">
-                    <div class="card-header-custom">
-                        <i class="fas fa-history"></i> Historial de Gastos
+                </c:if>
+
+                <c:if test="${param.status == 'deleted'}">
+
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+
+                        <i class="fas fa-info-circle"></i>
+
+                        <strong>¡Éxito!</strong> El gasto ha sido eliminado correctamente.
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
                     </div>
-                    <div class="card-body-custom">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Categoría</th>
-                                        <th>Subcategoría</th>
-                                        <th>Monto</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:forEach var="gasto" items="${gastos}">
-                                        <tr>
-                                            <td>
-                                                <i class="fas fa-calendar-day text-muted"></i> 
-                                                <fmt:formatDate value="${gasto.fecha}" pattern="dd/MM/yyyy" />
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-danger">
-                                                    <c:out value="${gasto.categoria}" />
-                                                </span>
-                                            </td>
-                                            <td><c:out value="${gasto.subcategoria}" /></td>
-                                            <td class="fw-bold text-danger">
-                                                <fmt:formatNumber value="${gasto.monto}" type="currency" currencySymbol="$" />
-                                            </td>
-                                            
-                                            <td>
-                                                <a href="#" class="btn btn-sm btn-outline-primary" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                    <c:if test="${empty gastos}">
-                                        <tr>
-                                            <td colspan="5">
-                                                <div class="empty-state">
-                                                    <i class="fas fa-inbox"></i>
-                                                    <p>No hay gastos registrados todavía</p>
-                                                    <small>Comienza añadiendo tu primer gasto</small>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:if>
-                                </tbody>
-                            </table>
+
+                </c:if>
+
+                <c:if test="${param.status == 'error'}">
+
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+                        <i class="fas fa-exclamation-triangle"></i>
+
+                        <strong>¡Error!</strong> Ocurrió un problema al procesar la solicitud.
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                    </div>
+
+                </c:if>
+
+        
+
+                <div class="row">
+
+                    <!-- Formulario para añadir gastos -->
+
+                    <div class="col-lg-5 col-md-12">
+
+                        <div class="card">
+
+                            <div class="card-header-custom">
+
+                                <i class="fas fa-plus-circle"></i> Registrar Nuevo Gasto
+
+                            </div>
+
+                            <div class="card-body-custom">
+
+                                <form action="${pageContext.request.contextPath}/gastos" method="post">
+
+                                    <div class="mb-3">
+
+                                        <label for="categoria" class="form-label">
+
+                                            <i class="fas fa-folder"></i> Categoría
+
+                                        </label>
+
+                                        <select class="form-select" id="categoria" name="categoria" required>
+
+                                            <option value="">Seleccione una categoría</option>
+
+                                            <option value="Vivienda">Vivienda</option>
+
+                                            <option value="Alimentación">Alimentacion</option>
+
+                                            <option value="Transporte">Transporte</option>
+
+                                            <option value="Ocio">Ocio</option>
+
+                                            <option value="Salud">Salud</option>
+
+                                            <option value="Educación">Educación</option>
+
+                                            <option value="Ropa">Ropa</option>
+
+                                            <option value="Otros">Otros</option>
+
+                                        </select>
+
+                                    </div>
+
+        
+
+                                    <div class="mb-3">
+
+                                        <label for="subcategoria" class="form-label">
+
+                                            <i class="fas fa-folder-open"></i> Subcategoría/Descripción
+
+                                        </label>
+
+                                        <input type="text" class="form-control" id="subcategoria" name="subcategoria" 
+
+                                               placeholder="Ej: Supermercado, Factura de luz, etc." required>
+
+                                    </div>
+
+        
+
+                                    <div class="mb-3">
+
+                                        <label for="monto" class="form-label">
+
+                                            <i class="fas fa-dollar-sign"></i> Monto
+
+                                        </label>
+
+                                        <input type="number" class="form-control" id="monto" name="monto" 
+
+                                               step="0.01" placeholder="0.00" required>
+
+                                    </div>
+
+        
+
+                                    <div class="mb-3">
+
+                                        <label for="fecha" class="form-label">
+
+                                            <i class="fas fa-calendar"></i> Fecha
+
+                                        </label>
+
+                                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+
+                                    </div>
+
+        
+
+                                    <button type="submit" class="btn btn-primary w-100">
+
+                                        <i class="fas fa-plus"></i> Añadir Gasto
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+                    </div>
+
+        
+
+                    <!-- Tabla de gastos -->
+
+                    <div class="col-lg-7 col-md-12">
+
+                        <div class="card">
+
+                            <div class="card-header-custom">
+
+                                <i class="fas fa-history"></i> Historial de Gastos
+
+                            </div>
+
+                            <div class="card-body-custom">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped table-hover">
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th>Fecha</th>
+
+                                                <th>Categoría</th>
+
+                                                <th>Subcategoría</th>
+
+                                                <th>Monto</th>
+
+                                                <th>Acciones</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody>
+
+                                            <c:forEach var="gasto" items="${gastos}">
+
+                                                <tr>
+
+                                                    <td>
+
+                                                        <i class="fas fa-calendar-day text-muted"></i> 
+
+                                                        <fmt:formatDate value="${gasto.fecha}" pattern="dd/MM/yyyy" />
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        <span class="badge bg-danger">
+
+                                                            <c:out value="${gasto.categoria}" />
+
+                                                        </span>
+
+                                                    </td>
+
+                                                    <td><c:out value="${gasto.subcategoria}" /></td>
+
+                                                    <td class="fw-bold text-danger">
+
+                                                        <fmt:formatNumber value="${gasto.monto}" type="currency" currencySymbol="$" />
+
+                                                    </td>
+
+                                                    
+
+                                                    <td class="d-flex">
+
+                                                        <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Editar"
+
+                                                                data-bs-toggle="modal" data-bs-target="#editGastoModal"
+
+                                                                data-id="${gasto.idgasto}"
+
+                                                                data-categoria="${gasto.categoria}"
+
+                                                                data-subcategoria="${gasto.subcategoria}"
+
+                                                                data-monto="<fmt:formatNumber value='${gasto.monto}' type='number' pattern='0.00' groupingUsed='false' />"
+
+                                                                data-fecha="<fmt:formatDate value='${gasto.fecha}' pattern='yyyy-MM-dd' />">
+
+                                                            <i class="fas fa-edit"></i>
+
+                                                        </button>
+
+                                                        <form action="${pageContext.request.contextPath}/gastos" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro?');" style="display:inline;">
+
+                                                            <input type="hidden" name="action" value="delete">
+
+                                                            <input type="hidden" name="id" value="${gasto.idgasto}">
+
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+
+                                                                <i class="fas fa-trash"></i>
+
+                                                            </button>
+
+                                                        </form>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            </c:forEach>
+
+                                            <c:if test="${empty gastos}">
+
+                                                <tr>
+
+                                                    <td colspan="5">
+
+                                                        <div class="empty-state">
+
+                                                            <i class="fas fa-inbox"></i>
+
+                                                            <p>No hay gastos registrados todavía</p>
+
+                                                            <small>Comienza añadiendo tu primer gasto</small>
+
+                                                        </div>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            </c:if>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- Modal de Edición -->
+
+        <div class="modal fade" id="editGastoModal" tabindex="-1" aria-labelledby="editGastoModalLabel" aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content">
+
+                    <div class="modal-header card-header-custom">
+
+                        <h5 class="modal-title" id="editGastoModalLabel"><i class="fas fa-edit"></i> Editar Gasto</h5>
+
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    </div>
+
+                    <form action="${pageContext.request.contextPath}/gastos" method="post">
+
+                        <div class="modal-body">
+
+                            <input type="hidden" name="action" value="update">
+
+                            <input type="hidden" name="id" id="edit-id">
+
+        
+
+                            <div class="mb-3">
+
+                                <label for="edit-categoria" class="form-label"><i class="fas fa-folder"></i> Categoría</label>
+
+                                <select class="form-select" id="edit-categoria" name="categoria" required>
+
+                                    <option value="Vivienda">Vivienda</option>
+
+                                    <option value="Alimentación">Alimentación</option>
+
+                                    <option value="Transporte">Transporte</option>
+
+                                    <option value="Ocio">Ocio</option>
+
+                                    <option value="Salud">Salud</option>
+
+                                    <option value="Educación">Educación</option>
+
+                                    <option value="Ropa">Ropa</option>
+
+                                    <option value="Otros">Otros</option>
+
+                                </select>
+
+                            </div>
+
+        
+
+                            <div class="mb-3">
+
+                                <label for="edit-subcategoria" class="form-label"><i class="fas fa-folder-open"></i> Subcategoría/Descripción</label>
+
+                                <input type="text" class="form-control" id="edit-subcategoria" name="subcategoria" required>
+
+                            </div>
+
+        
+
+                            <div class="mb-3">
+
+                                <label for="edit-monto" class="form-label"><i class="fas fa-dollar-sign"></i> Monto</label>
+
+                                <input type="number" class="form-control" id="edit-monto" name="monto" step="0.01" required>
+
+                            </div>
+
+        
+
+                            <div class="mb-3">
+
+                                <label for="edit-fecha" class="form-label"><i class="fas fa-calendar"></i> Fecha</label>
+
+                                <input type="date" class="form-control" id="edit-fecha" name="fecha" required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+
+            var editModal = document.getElementById('editGastoModal');
+
+            editModal.addEventListener('show.bs.modal', function (event) {
+
+                var button = event.relatedTarget;
+
+                var id = button.getAttribute('data-id');
+
+                var categoria = button.getAttribute('data-categoria');
+
+                var subcategoria = button.getAttribute('data-subcategoria');
+
+                var monto = button.getAttribute('data-monto');
+
+                var fecha = button.getAttribute('data-fecha');
+
+        
+
+                var modal = this;
+
+                modal.querySelector('#edit-id').value = id;
+
+                modal.querySelector('#edit-categoria').value = categoria;
+
+                modal.querySelector('#edit-subcategoria').value = subcategoria;
+
+                modal.querySelector('#edit-monto').value = monto;
+
+                modal.querySelector('#edit-fecha').value = fecha;
+
+            });
+
+        </script>
+
+        </body>
+
+        </html>
+
+        

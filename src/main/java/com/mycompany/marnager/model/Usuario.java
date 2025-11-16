@@ -1,7 +1,9 @@
 package com.mycompany.marnager.model;
 
 import java.io.Serializable;
+import java.util.List;
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -39,6 +42,15 @@ public class Usuario implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "password")
     private String password;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
+    private List<Ingreso> ingresoList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
+    private List<Gasto> gastoList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
+    private List<Ahorro> ahorroList;
 
     public Usuario() {
     }
@@ -75,6 +87,30 @@ public class Usuario implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Ingreso> getIngresoList() {
+        return ingresoList;
+    }
+
+    public void setIngresoList(List<Ingreso> ingresoList) {
+        this.ingresoList = ingresoList;
+    }
+
+    public List<Gasto> getGastoList() {
+        return gastoList;
+    }
+
+    public void setGastoList(List<Gasto> gastoList) {
+        this.gastoList = gastoList;
+    }
+
+    public List<Ahorro> getAhorroList() {
+        return ahorroList;
+    }
+
+    public void setAhorroList(List<Ahorro> ahorroList) {
+        this.ahorroList = ahorroList;
     }
 
     @Override

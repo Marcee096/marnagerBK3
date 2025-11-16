@@ -224,11 +224,32 @@
             <p>Registra y administra todas tus fuentes de ingreso</p>
         </div>
 
-        <!-- Mensaje de éxito -->
-        <c:if test="${param.status == 'success'}">
+        <!-- Mensajes de estado -->
+        <c:if test="${param.status == 'created'}">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle"></i>
                 <strong>¡Éxito!</strong> El ingreso ha sido guardado correctamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+        <c:if test="${param.status == 'updated'}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i>
+                <strong>¡Éxito!</strong> El ingreso ha sido actualizado correctamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+        <c:if test="${param.status == 'deleted'}">
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>¡Éxito!</strong> El ingreso ha sido eliminado correctamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+        <c:if test="${param.status == 'error'}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>¡Error!</strong> Ocurrió un problema al procesar la solicitud.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:if>
@@ -290,72 +311,302 @@
                 </div>
             </div>
 
-            <!-- Tabla de ingresos -->
-            <div class="col-lg-7 col-md-12">
-                <div class="card">
-                    <div class="card-header-custom">
-                        <i class="fas fa-history"></i> Historial de Ingresos
-                    </div>
-                    <div class="card-body-custom">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Categoría</th>
-                                        <th>Subcategoría</th>
-                                        <th>Monto</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:forEach var="ingreso" items="${ingresos}">
-                                        <tr>
-                                            <td>
-                                                <i class="fas fa-calendar-day text-muted"></i> 
-                                                <fmt:formatDate value="${ingreso.fecha}" pattern="dd/MM/yyyy" />
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-primary">
-                                                    <c:out value="${ingreso.categoria}" />
-                                                </span>
-                                            </td>
-                                            <td><c:out value="${ingreso.subcategoria}" /></td>
-                                            <td class="fw-bold text-success">
-                                                <fmt:formatNumber value="${ingreso.monto}" type="currency" currencySymbol="$" />
-                                            </td>
-                                            
-                                            <td>
-                                                <a href="#" class="btn btn-sm btn-outline-primary" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                    <c:if test="${empty ingresos}">
-                                        <tr>
-                                            <td colspan="6">
-                                                <div class="empty-state">
-                                                    <i class="fas fa-inbox"></i>
-                                                    <p>No hay ingresos registrados todavía</p>
-                                                    <small>Comienza añadiendo tu primer ingreso</small>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:if>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                        <!-- Tabla de ingresos -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+                        <div class="col-lg-7 col-md-12">
+
+                            <div class="card">
+
+                                <div class="card-header-custom">
+
+                                    <i class="fas fa-history"></i> Historial de Ingresos
+
+                                </div>
+
+                                <div class="card-body-custom">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover">
+
+                                            <thead>
+
+                                                <tr>
+
+                                                    <th>Fecha</th>
+
+                                                    <th>Categoría</th>
+
+                                                    <th>Subcategoría</th>
+
+                                                    <th>Monto</th>
+
+                                                    <th>Acciones</th>
+
+                                                </tr>
+
+                                            </thead>
+
+                                            <tbody>
+
+                                                <c:forEach var="ingreso" items="${ingresos}">
+
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <i class="fas fa-calendar-day text-muted"></i> 
+
+                                                            <fmt:formatDate value="${ingreso.fecha}" pattern="dd/MM/yyyy" />
+
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span class="badge bg-primary">
+
+                                                                <c:out value="${ingreso.categoria}" />
+
+                                                            </span>
+
+                                                        </td>
+
+                                                        <td><c:out value="${ingreso.subcategoria}" /></td>
+
+                                                        <td class="fw-bold text-success">
+
+                                                            <fmt:formatNumber value="${ingreso.monto}" type="currency" currencySymbol="$" />
+
+                                                        </td>
+
+                                                        <td class="d-flex">
+
+                                                            <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Editar"
+
+                                                                    data-bs-toggle="modal" data-bs-target="#editIngresoModal"
+
+                                                                    data-id="${ingreso.idingreso}"
+
+                                                                    data-categoria="${ingreso.categoria}"
+
+                                                                    data-subcategoria="${ingreso.subcategoria}"
+
+                                                                    data-monto="<fmt:formatNumber value='${ingreso.monto}' type='number' pattern='0.00' groupingUsed='false' />"
+
+                                                                    data-fecha="<fmt:formatDate value='${ingreso.fecha}' pattern='yyyy-MM-dd' />">
+
+                                                                <i class="fas fa-edit"></i>
+
+                                                            </button>
+
+                                                            <form action="${pageContext.request.contextPath}/ingresos" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro?');" style="display:inline;">
+
+                                                                <input type="hidden" name="action" value="delete">
+
+                                                                <input type="hidden" name="id" value="${ingreso.idingreso}">
+
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+
+                                                                    <i class="fas fa-trash"></i>
+
+                                                                </button>
+
+                                                            </form>
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                </c:forEach>
+
+                                                <c:if test="${empty ingresos}">
+
+                                                    <tr>
+
+                                                        <td colspan="5">
+
+                                                            <div class="empty-state">
+
+                                                                <i class="fas fa-inbox"></i>
+
+                                                                <p>No hay ingresos registrados todavía</p>
+
+                                                                <small>Comienza añadiendo tu primer ingreso</small>
+
+                                                            </div>
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                </c:if>
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- Modal de Edición -->
+
+            <div class="modal fade" id="editIngresoModal" tabindex="-1" aria-labelledby="editIngresoModalLabel" aria-hidden="true">
+
+                <div class="modal-dialog modal-dialog-centered">
+
+                    <div class="modal-content">
+
+                        <div class="modal-header card-header-custom">
+
+                            <h5 class="modal-title" id="editIngresoModalLabel"><i class="fas fa-edit"></i> Editar Ingreso</h5>
+
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                        </div>
+
+                        <form action="${pageContext.request.contextPath}/ingresos" method="post">
+
+                            <div class="modal-body">
+
+                                <input type="hidden" name="action" value="update">
+
+                                <input type="hidden" name="id" id="edit-id">
+
+            
+
+                                <div class="mb-3">
+
+                                    <label for="edit-categoria" class="form-label"><i class="fas fa-folder"></i> Categoría</label>
+
+                                    <select class="form-select" id="edit-categoria" name="categoria" required>
+
+                                        <option value="Salario">Salario</option>
+
+                                        <option value="Freelance">Freelance</option>
+
+                                        <option value="Inversiones">Inversiones</option>
+
+                                        <option value="Ventas">Ventas</option>
+
+                                        <option value="Alquiler">Alquiler</option>
+
+                                        <option value="Otros">Otros</option>
+
+                                    </select>
+
+                                </div>
+
+            
+
+                                <div class="mb-3">
+
+                                    <label for="edit-subcategoria" class="form-label"><i class="fas fa-folder-open"></i> Subcategoría</label>
+
+                                    <input type="text" class="form-control" id="edit-subcategoria" name="subcategoria" required>
+
+                                </div>
+
+            
+
+                                <div class="mb-3">
+
+                                    <label for="edit-monto" class="form-label"><i class="fas fa-dollar-sign"></i> Monto</label>
+
+                                    <input type="number" class="form-control" id="edit-monto" name="monto" step="0.01" required>
+
+                                </div>
+
+            
+
+                                <div class="mb-3">
+
+                                    <label for="edit-fecha" class="form-label"><i class="fas fa-calendar"></i> Fecha</label>
+
+                                    <input type="date" class="form-control" id="edit-fecha" name="fecha" required>
+
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+            <script>
+
+                var editModal = document.getElementById('editIngresoModal');
+
+                editModal.addEventListener('show.bs.modal', function (event) {
+
+                    // Botón que activó el modal
+
+                    var button = event.relatedTarget;
+
+            
+
+                    // Extraer la información de los atributos data-*
+
+                    var id = button.getAttribute('data-id');
+
+                    var categoria = button.getAttribute('data-categoria');
+
+                    var subcategoria = button.getAttribute('data-subcategoria');
+
+                    var monto = button.getAttribute('data-monto');
+
+                    var fecha = button.getAttribute('data-fecha');
+
+            
+
+                    // Actualizar los campos del formulario en el modal
+
+                    var modal = this;
+
+                    modal.querySelector('#edit-id').value = id;
+
+                    modal.querySelector('#edit-categoria').value = categoria;
+
+                    modal.querySelector('#edit-subcategoria').value = subcategoria;
+
+                    modal.querySelector('#edit-monto').value = monto;
+
+                    modal.querySelector('#edit-fecha').value = fecha;
+
+                });
+
+            </script>
+
+            </body>
+
+            </html>
+
+            

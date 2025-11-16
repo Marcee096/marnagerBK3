@@ -13,6 +13,27 @@ A continuación se detallan las herramientas y versiones que se utilizarán en e
 
 ## Hitos del Proyecto
 
+*   **2025-11-15:**
+    *   **Implementación de Interfaz de Usuario y Sesión:**
+        *   Creación de `LogoutServlet.java` para invalidar la sesión del usuario.
+        *   Creación de una barra de navegación superior reutilizable (`topbar.jsp`) con un menú de perfil de usuario y enlace para cerrar sesión.
+        *   Modificación de `home.jsp` para incluir la nueva barra de navegación y actualizar los enlaces del menú lateral a las nuevas secciones.
+    *   **Resolución de `PropertyNotFoundException`:**
+        *   Inicialmente se intentó solucionar añadiendo los campos `nombre` y `apellido` a la entidad `Usuario` y al flujo de registro.
+        *   Tras la aclaración del usuario, se revirtieron los cambios en el modelo `Usuario` y el registro.
+        *   Se corrigió la causa raíz del error modificando `topbar.jsp` y `home.jsp` para que usaran el `email` del usuario (disponible en el modelo) para la personalización, en lugar de `nombre`.
+    *   **Desarrollo de Módulos de Gestión (Ingresos, Gastos, Ahorros):**
+        *   Se crearon los servlets `IngresosServlet`, `GastosServlet` y `AhorrosServlet` para manejar la lógica de negocio.
+        *   Se rediseñaron completamente las páginas `ingresos.jsp`, `gastos.jsp` y `ahorros.jsp` con un estilo visual profesional y coherente.
+        *   Los formularios en estas páginas se adaptaron para usar los campos correctos del modelo (`categoria`, `subcategoria`, `monto`, `fecha`).
+        *   Se implementó la lógica de guardado (`doPost`) en los tres servlets para persistir los nuevos registros en la base de datos.
+        *   Se añadió un sistema de notificación de éxito en las tres páginas para confirmar al usuario que los datos se han guardado correctamente.
+    *   **Actualización del Dashboard (`home.jsp`):**
+        *   Se modificó `HomeServlet` para calcular los totales de ingresos, gastos y ahorros.
+        *   Se implementó la preparación de datos y su conversión a JSON para alimentar los gráficos de la página principal.
+        *   Se añadió la dependencia de `Gson` al `pom.xml` para manejar la conversión a JSON.
+--- End of Context from: GEMINI.md ---
+
 *   **2025-11-11:**
     *   Creación del archivo `GEMINI.md` para el seguimiento del proyecto.
     *   **Estructura y Organización de JSP:**

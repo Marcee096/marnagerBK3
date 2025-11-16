@@ -46,37 +46,90 @@ public class IngresosServlet extends HttpServlet {
             return;
         }
 
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "create"; // Acción por defecto
+        }
+
         try {
-            // 1. Obtener parámetros del request
+            switch (action) {
+                case "update":
+                    handleUpdate(request, response, usuario);
+                    break;
+                case "delete":
+                    handleDelete(request, response, usuario);
+                    break;
+                case "create":
+                default:
+                    handleCreate(request, response, usuario);
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/ingresos?status=error");
+        }
+    }
+
+    private void handleCreate(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws Exception {
+        String categoria = request.getParameter("categoria");
+        String subcategoria = request.getParameter("subcategoria");
+        String montoStr = request.getParameter("monto");
+        String fechaStr = request.getParameter("fecha");
+
+        java.math.BigDecimal monto = new java.math.BigDecimal(montoStr);
+        java.util.Date fecha = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(fechaStr);
+
+        Ingreso nuevoIngreso = new Ingreso();
+        nuevoIngreso.setCategoria(categoria);
+        nuevoIngreso.setSubcategoria(subcategoria);
+        nuevoIngreso.setMonto(monto);
+        nuevoIngreso.setFecha(fecha);
+        nuevoIngreso.setUsuario(usuario);
+
+        ingresoFacade.create(nuevoIngreso);
+
+        response.sendRedirect(request.getContextPath() + "/ingresos?status=created");
+    }
+
+    private void handleUpdate(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws Exception {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Ingreso ingreso = ingresoFacade.find(id);
+
+        if (ingreso != null && ingreso.getUsuario().equals(usuario)) {
             String categoria = request.getParameter("categoria");
             String subcategoria = request.getParameter("subcategoria");
             String montoStr = request.getParameter("monto");
             String fechaStr = request.getParameter("fecha");
-            
-            // 2. Obtener el usuario de la sesión
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-            // 3. Conversión y validación de datos
             java.math.BigDecimal monto = new java.math.BigDecimal(montoStr);
             java.util.Date fecha = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(fechaStr);
 
-            // 4. Crear la nueva entidad Ingreso
-            Ingreso nuevoIngreso = new Ingreso();
-            nuevoIngreso.setCategoria(categoria);
-            nuevoIngreso.setSubcategoria(subcategoria);
-            nuevoIngreso.setMonto(monto);
-            nuevoIngreso.setFecha(fecha);
-            nuevoIngreso.setUsuario(usuario);
+            ingreso.setCategoria(categoria);
+            ingreso.setSubcategoria(subcategoria);
+            ingreso.setMonto(monto);
+            ingreso.setFecha(fecha);
 
-            // 5. Persistir la entidad
-            ingresoFacade.create(nuevoIngreso);
+            ingresoFacade.edit(ingreso);
+            response.sendRedirect(request.getContextPath() + "/ingresos?status=updated");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/ingresos?status=error");
+        }
+    }
 
-            // 6. Redirigir con mensaje de éxito
-            response.sendRedirect(request.getContextPath() + "/ingresos?status=success");
+    private void handleDelete(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Ingreso ingreso = ingresoFacade.find(id);
 
-        } catch (Exception e) {
-            // Manejo básico de errores (en un caso real, sería más robusto)
-            e.printStackTrace();
+            if (ingreso != null && ingreso.getUsuario().equals(usuario)) {
+                ingresoFacade.remove(ingreso);
+                response.sendRedirect(request.getContextPath() + "/ingresos?status=deleted");
+            } else {
+                // El ingreso no existe o no pertenece al usuario
+                response.sendRedirect(request.getContextPath() + "/ingresos?status=error");
+            }
+        } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/ingresos?status=error");
         }
     }
