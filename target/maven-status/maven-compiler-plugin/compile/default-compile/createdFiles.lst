@@ -6,6 +6,7 @@ com\mycompany\marnager\servlet\LogoutServlet.class
 com\mycompany\marnager\model\Ingreso.class
 com\mycompany\marnager\servlet\LoginServlet.class
 com\mycompany\marnager\JakartaRestConfiguration.class
+com\mycompany\marnager\dto\TransaccionDTO.class
 com\mycompany\marnager\model\Ahorro.class
 com\mycompany\marnager\ejb\GastoFacade.class
 com\mycompany\marnager\ejb\IngresoFacade.class

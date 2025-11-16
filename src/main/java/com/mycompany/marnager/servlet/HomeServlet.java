@@ -54,6 +54,18 @@ public class HomeServlet extends HttpServlet {
         List<Gasto> gastos = gastoFacade.findByUser(usuario);
         List<Ahorro> ahorros = ahorroFacade.findByUser(usuario);
         
+        // --- Lógica para Últimas Transacciones ---
+        List<com.mycompany.marnager.dto.TransaccionDTO> todasLasTransacciones = new ArrayList<>();
+        ingresos.forEach(i -> todasLasTransacciones.add(new com.mycompany.marnager.dto.TransaccionDTO("Ingreso", i.getCategoria(), i.getMonto(), i.getFecha())));
+        gastos.forEach(g -> todasLasTransacciones.add(new com.mycompany.marnager.dto.TransaccionDTO("Gasto", g.getCategoria(), g.getMonto(), g.getFecha())));
+        ahorros.forEach(a -> todasLasTransacciones.add(new com.mycompany.marnager.dto.TransaccionDTO("Ahorro", a.getCategoria(), a.getMonto(), a.getFecha())));
+
+        // Ordenar por fecha descendente
+        todasLasTransacciones.sort(java.util.Comparator.comparing(com.mycompany.marnager.dto.TransaccionDTO::getFecha).reversed());
+
+        // Tomar las últimas 10
+        List<com.mycompany.marnager.dto.TransaccionDTO> ultimasTransacciones = todasLasTransacciones.stream().limit(10).collect(Collectors.toList());
+        
         // Calcular totales
         BigDecimal totalIngresos = ingresos.stream().map(Ingreso::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalGastos = gastos.stream().map(Gasto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -66,7 +78,7 @@ public class HomeServlet extends HttpServlet {
         List<String> labelsEvolucion = new ArrayList<>();
         List<BigDecimal> dataEvolucion = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
-        gastos.stream().limit(7).forEach(g -> {
+        gastos.stream().sorted(java.util.Comparator.comparing(Gasto::getFecha).reversed()).limit(7).forEach(g -> {
             labelsEvolucion.add(sdf.format(g.getFecha()));
             dataEvolucion.add(g.getMonto());
         });
@@ -83,17 +95,13 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("totalIngresos", totalIngresos);
         request.setAttribute("totalGastos", totalGastos);
         request.setAttribute("totalAhorros", totalAhorros);
+        request.setAttribute("ultimasTransacciones", ultimasTransacciones); // <-- Nueva lista
         
         // Pasar datos para gráficos como JSON
         request.setAttribute("labelsJSON", gson.toJson(labelsEvolucion));
         request.setAttribute("gastosDataJSON", gson.toJson(dataEvolucion));
         request.setAttribute("categoriasJSON", gson.toJson(labelsDistribucion));
         request.setAttribute("distribucionJSON", gson.toJson(dataDistribucion));
-        
-        // Pasar listas completas por si se necesitan
-        request.setAttribute("ingresos", ingresos);
-        request.setAttribute("gastos", gastos);
-        request.setAttribute("ahorros", ahorros);
         
         request.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(request, response);
     }

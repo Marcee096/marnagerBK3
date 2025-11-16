@@ -487,23 +487,62 @@
                     <div class="chart-card">
                         <h5><i class="fas fa-clock-rotate-left"></i> Últimas Transacciones</h5>
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th><i class="fas fa-calendar"></i> Fecha</th>
-                                        <th><i class="fas fa-file-lines"></i> Descripción</th>
-                                        <th><i class="fas fa-dollar-sign"></i> Monto</th>
+                                        <th>Tipo</th>
+                                        <th>Categoría</th>
+                                        <th>Fecha</th>
+                                        <th class="text-end">Monto</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="t" items="${transacciones}">
+                                    <c:if test="${empty ultimasTransacciones}">
+                                        <tr>
+                                            <td colspan="4">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-inbox"></i>
+                                                    <p>Aún no has registrado ninguna transacción.</p>
+                                                    <small>¡Comienza añadiendo un ingreso, gasto o ahorro!</small>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:forEach var="t" items="${ultimasTransacciones}">
                                         <tr>
                                             <td>
-                                                <fmt:formatDate value="${t.fecha}" pattern="dd/MM/yyyy" />
+                                                <c:choose>
+                                                    <c:when test="${t.tipo == 'Ingreso'}">
+                                                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill">
+                                                            <i class="fas fa-arrow-up me-1"></i> Ingreso
+                                                        </span>
+                                                    </c:when>
+                                                    <c:when test="${t.tipo == 'Gasto'}">
+                                                        <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">
+                                                            <i class="fas fa-arrow-down me-1"></i> Gasto
+                                                        </span>
+                                                    </c:when>
+                                                    <c:when test="${t.tipo == 'Ahorro'}">
+                                                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill">
+                                                            <i class="fas fa-piggy-bank me-1"></i> Ahorro
+                                                        </span>
+                                                    </c:when>
+                                                </c:choose>
                                             </td>
-                                            <td><c:out value="${t.descripcion}" /></td>
-                                            <td class="<c:out value='${t.monto > 0 ? "text-income" : "text-expense"}' />">
-                                                <fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" />
+                                            <td><c:out value="${t.categoria}" /></td>
+                                            <td><fmt:formatDate value="${t.fecha}" pattern="dd/MM/yyyy" /></td>
+                                            <td class="text-end fw-bold">
+                                                <c:choose>
+                                                    <c:when test="${t.tipo == 'Ingreso'}">
+                                                        <span class="text-success">+<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                                    </c:when>
+                                                    <c:when test="${t.tipo == 'Gasto'}">
+                                                        <span class="text-danger">-<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                                    </c:when>
+                                                    <c:when test="${t.tipo == 'Ahorro'}">
+                                                        <span class="text-info">+<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                                    </c:when>
+                                                </c:choose>
                                             </td>
                                         </tr>
                                     </c:forEach>
