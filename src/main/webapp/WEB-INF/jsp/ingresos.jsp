@@ -224,6 +224,15 @@
             <p>Registra y administra todas tus fuentes de ingreso</p>
         </div>
 
+        <!-- Mensaje de éxito -->
+        <c:if test="${param.status == 'success'}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i>
+                <strong>¡Éxito!</strong> El ingreso ha sido guardado correctamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
+
         <div class="row">
             <!-- Formulario para añadir ingresos -->
             <div class="col-lg-5 col-md-12">
@@ -264,13 +273,7 @@
                                        step="0.01" placeholder="0.00" required>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="detalle" class="form-label">
-                                    <i class="fas fa-info-circle"></i> Detalle
-                                </label>
-                                <input type="text" class="form-control" id="detalle" name="detalle" 
-                                       placeholder="Ej: Efectivo, Transferencia bancaria" required>
-                            </div>
+                            
 
                             <div class="mb-3">
                                 <label for="fecha" class="form-label">
@@ -302,7 +305,6 @@
                                         <th>Categoría</th>
                                         <th>Subcategoría</th>
                                         <th>Monto</th>
-                                        <th>Detalle</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -322,7 +324,7 @@
                                             <td class="fw-bold text-success">
                                                 <fmt:formatNumber value="${ingreso.monto}" type="currency" currencySymbol="$" />
                                             </td>
-                                            <td><small class="text-muted"><c:out value="${ingreso.detalle}" /></small></td>
+                                            
                                             <td>
                                                 <a href="#" class="btn btn-sm btn-outline-primary" title="Editar">
                                                     <i class="fas fa-edit"></i>
