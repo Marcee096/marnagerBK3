@@ -1,10 +1,18 @@
 package com.mycompany.marnager.servlet;
 
+import com.google.gson.Gson;
 import com.mycompany.marnager.ejb.AhorroFacade;
 import com.mycompany.marnager.model.Ahorro;
 import com.mycompany.marnager.model.Usuario;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,8 +27,7 @@ public class AhorrosServlet extends HttpServlet {
     @EJB
     private AhorroFacade ahorroFacade;
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         HttpSession session = request.getSession(false);
@@ -28,12 +35,64 @@ public class AhorrosServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-        
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        List<Ahorro> listaAhorros = ahorroFacade.findByUser(usuario);
+
+        // --- Lógica de Visualización (GET) ---
         
+        LocalDate now = LocalDate.now();
+        int selectedYear;
+        int selectedMonth;
+
+        try {
+            selectedYear = Integer.parseInt(request.getParameter("year"));
+            selectedMonth = Integer.parseInt(request.getParameter("month"));
+        } catch (NumberFormatException | NullPointerException e) {
+            selectedYear = now.getYear();
+            selectedMonth = now.getMonthValue();
+        }
+
+        List<Map<String, String>> monthOptions = new ArrayList<>();
+        Locale spanishLocale = new Locale("es", "ES");
+        for (int i = 0; i < 12; i++) {
+            LocalDate date = now.minusMonths(i);
+            String monthName = date.getMonth().getDisplayName(TextStyle.FULL, spanishLocale);
+            monthName = monthName.substring(0, 1).toUpperCase() + monthName.substring(1);
+            monthOptions.add(Map.of(
+                "year", String.valueOf(date.getYear()),
+                "month", String.valueOf(date.getMonthValue()),
+                "name", monthName + " " + date.getYear()
+            ));
+        }
+
+        List<Ahorro> listaAhorros = ahorroFacade.findByUserAndMonth(usuario, selectedYear, selectedMonth);
+
+        Map<String, BigDecimal> distribucionMap = listaAhorros.stream()
+                .collect(Collectors.groupingBy(Ahorro::getCategoria,
+                        Collectors.reducing(BigDecimal.ZERO, Ahorro::getMonto, BigDecimal::add)));
+
+        Gson gson = new Gson();
+        List<String> labelsDistribucion = new ArrayList<>(distribucionMap.keySet());
+        List<BigDecimal> dataDistribucion = new ArrayList<>(distribucionMap.values());
+
         request.setAttribute("ahorros", listaAhorros);
+        request.setAttribute("selectedYear", selectedYear);
+        request.setAttribute("selectedMonth", selectedMonth);
+        request.setAttribute("monthOptions", monthOptions);
+        request.setAttribute("categoriasJSON", gson.toJson(labelsDistribucion));
+        request.setAttribute("distribucionJSON", gson.toJson(dataDistribucion));
+        
+        String status = request.getParameter("status");
+        if (status != null) {
+            request.setAttribute("status", status);
+        }
+
         request.getRequestDispatcher("/WEB-INF/jsp/ahorros.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     @Override
@@ -49,29 +108,37 @@ public class AhorrosServlet extends HttpServlet {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         String action = request.getParameter("action");
         if (action == null) {
-            action = "create"; // Acción por defecto
+            action = "create";
         }
 
+        String status = "error";
         try {
             switch (action) {
                 case "update":
-                    handleUpdate(request, response, usuario);
+                    if (handleUpdate(request, usuario)) status = "updated";
                     break;
                 case "delete":
-                    handleDelete(request, response, usuario);
+                    if (handleDelete(request, usuario)) status = "deleted";
                     break;
                 case "create":
                 default:
-                    handleCreate(request, response, usuario);
+                    if (handleCreate(request, usuario)) status = "created";
                     break;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/ahorros?status=error");
         }
+        
+        String year = request.getParameter("year");
+        String month = request.getParameter("month");
+        String redirectUrl = request.getContextPath() + "/ahorros?status=" + status;
+        if (year != null && month != null && !year.isEmpty() && !month.isEmpty()) {
+            redirectUrl += "&year=" + year + "&month=" + month;
+        }
+        response.sendRedirect(redirectUrl);
     }
 
-    private void handleCreate(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws Exception {
+    private boolean handleCreate(HttpServletRequest request, Usuario usuario) throws Exception {
         String categoria = request.getParameter("categoria");
         String subcategoria = request.getParameter("subcategoria");
         String montoStr = request.getParameter("monto");
@@ -88,11 +155,10 @@ public class AhorrosServlet extends HttpServlet {
         nuevoAhorro.setUsuario(usuario);
 
         ahorroFacade.create(nuevoAhorro);
-
-        response.sendRedirect(request.getContextPath() + "/ahorros?status=created");
+        return true;
     }
 
-    private void handleUpdate(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws Exception {
+    private boolean handleUpdate(HttpServletRequest request, Usuario usuario) throws Exception {
         int id = Integer.parseInt(request.getParameter("id"));
         Ahorro ahorro = ahorroFacade.find(id);
 
@@ -111,26 +177,24 @@ public class AhorrosServlet extends HttpServlet {
             ahorro.setFecha(fecha);
 
             ahorroFacade.edit(ahorro);
-            response.sendRedirect(request.getContextPath() + "/ahorros?status=updated");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/ahorros?status=error");
+            return true;
         }
+        return false;
     }
 
-    private void handleDelete(HttpServletRequest request, HttpServletResponse response, Usuario usuario) throws IOException {
+    private boolean handleDelete(HttpServletRequest request, Usuario usuario) {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             Ahorro ahorro = ahorroFacade.find(id);
 
             if (ahorro != null && ahorro.getUsuario().equals(usuario)) {
                 ahorroFacade.remove(ahorro);
-                response.sendRedirect(request.getContextPath() + "/ahorros?status=deleted");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/ahorros?status=error");
+                return true;
             }
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/ahorros?status=error");
+            return false;
         }
+        return false;
     }
 
     @Override
