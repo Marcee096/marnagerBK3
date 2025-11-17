@@ -235,10 +235,67 @@
         <!-- Últimas transacciones -->
         <div class="card mt-4">
             <div class="card-body chart-card">
-                <h5><i class="fas fa-clock-rotate-left"></i> Últimas Transacciones (Global)</h5>
+                <h5> Últimos registros del Mes</h5>
                 <div class="table-responsive">
                     <table class="table table-hover">
-                        <!-- ... (código de la tabla de transacciones sin cambios) ... -->
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Categoría</th>
+                                <th>Fecha</th>
+                                <th class="text-end">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:if test="${empty ultimasTransacciones}">
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <p>No hay transacciones registradas para este mes.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </c:if>
+                            <c:forEach var="t" items="${ultimasTransacciones}">
+                                <tr>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${t.tipo == 'Ingreso'}">
+                                                <span class="badge bg-success-subtle text-success-emphasis rounded-pill">
+                                                    <i class="fas fa-arrow-up me-1"></i> Ingreso
+                                                </span>
+                                            </c:when>
+                                            <c:when test="${t.tipo == 'Gasto'}">
+                                                <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">
+                                                    <i class="fas fa-arrow-down me-1"></i> Gasto
+                                                </span>
+                                            </c:when>
+                                            <c:when test="${t.tipo == 'Ahorro'}">
+                                                <span class="badge bg-info-subtle text-info-emphasis rounded-pill">
+                                                    <i class="fas fa-piggy-bank me-1"></i> Ahorro
+                                                </span>
+                                            </c:when>
+                                        </c:choose>
+                                    </td>
+                                    <td><c:out value="${t.categoria}" /></td>
+                                    <td><fmt:formatDate value="${t.fecha}" pattern="dd/MM/yyyy" /></td>
+                                    <td class="text-end fw-bold">
+                                        <c:choose>
+                                            <c:when test="${t.tipo == 'Ingreso'}">
+                                                <span class="text-success">+<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                            </c:when>
+                                            <c:when test="${t.tipo == 'Gasto'}">
+                                                <span class="text-danger">-<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                            </c:when>
+                                            <c:when test="${t.tipo == 'Ahorro'}">
+                                                <span class="text-info">+<fmt:formatNumber value="${t.monto}" type="currency" currencySymbol="$" /></span>
+                                            </c:when>
+                                        </c:choose>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
                     </table>
                 </div>
             </div>
