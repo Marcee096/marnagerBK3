@@ -13,6 +13,22 @@ A continuación se detallan las herramientas y versiones que se utilizarán en e
 
 ## Hitos del Proyecto
 
+*   **2025-11-16:**
+    *   **Diagnóstico y Corrección de Base de Datos:**
+        *   Se identificó a través de un `SQLException` que las tablas `gasto` y `ahorro` no tenían la propiedad `AUTO_INCREMENT` en sus claves primarias.
+        *   Se corrigió el archivo `contexto/base_de_datos/scriptTablas.sql` para incluir `AUTO_INCREMENT` en `idgasto` e `idahorro`.
+        *   Se proporcionaron los comandos `ALTER TABLE` para reparar la base de datos existente sin pérdida de datos.
+    *   **Implementación de Funcionalidad CRUD Completa (Ingresos, Gastos, Ahorros):**
+        *   Se implementó la funcionalidad de **Editar** y **Eliminar** para las tres secciones.
+        *   La **edición** se realiza a través de una **ventana modal** en la misma página, mejorando la experiencia de usuario.
+        *   La **eliminación** incluye un diálogo de confirmación para prevenir borrados accidentales.
+        *   Se refactorizaron los Servlets (`IngresosServlet`, `GastosServlet`, `AhorrosServlet`) para manejar las acciones de `create`, `update` y `delete`.
+        *   Se implementaron las comprobaciones de seguridad para asegurar que un usuario solo pueda modificar sus propios datos.
+    *   **Mejora del Dashboard (`home.jsp`):**
+        *   Se implementó la lógica en `HomeServlet` para obtener los últimos 10 movimientos del usuario (ingresos, gastos y ahorros combinados).
+        *   Se creó un `TransaccionDTO` para manejar los datos de forma unificada.
+        *   Se actualizó la tabla en `home.jsp` para mostrar estas transacciones, ordenadas por fecha y con estilos distintivos para cada tipo.
+
 *   **2025-11-15:**
     *   **Implementación de Interfaz de Usuario y Sesión:**
         *   Creación de `LogoutServlet.java` para invalidar la sesión del usuario.
@@ -32,7 +48,6 @@ A continuación se detallan las herramientas y versiones que se utilizarán en e
         *   Se modificó `HomeServlet` para calcular los totales de ingresos, gastos y ahorros.
         *   Se implementó la preparación de datos y su conversión a JSON para alimentar los gráficos de la página principal.
         *   Se añadió la dependencia de `Gson` al `pom.xml` para manejar la conversión a JSON.
---- End of Context from: GEMINI.md ---
 
 *   **2025-11-11:**
     *   Creación del archivo `GEMINI.md` para el seguimiento del proyecto.

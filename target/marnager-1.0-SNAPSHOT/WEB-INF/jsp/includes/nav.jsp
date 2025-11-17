@@ -3,7 +3,7 @@
     <img src="${pageContext.request.contextPath}/assets/logomarna.png" alt="Ilustración de logo" />
     <ul>
         <li><a href="${pageContext.request.contextPath}/tuto.jsp">Cómo funciona</a></li>
-        <li><a href="${pageContext.request.contextPath}/WEB-INF/jsp/secciones.jsp">Secciones</a></li>
+        <li><a href="${pageContext.request.contextPath}/index.jsp">Secciones</a></li>
         <li><a href="${pageContext.request.contextPath}/nosotros.jsp">Nosotros</a></li>
         <li><a href="${pageContext.request.contextPath}/edu.jsp">Educación financiera</a></li>
     </ul>

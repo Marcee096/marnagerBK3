@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Financiero - Marnager</title>
+    <title>Marnager</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,7 +23,7 @@
             left: 0;
             width: 260px;
             height: 100vh;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            background-color: #3D38F5;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
@@ -78,7 +78,7 @@
         .welcome-banner {
             color: black;
             border-radius: 15px;
-            padding: 40px;
+            padding: 20px;
             margin-bottom: 30px;
         }
         
@@ -98,15 +98,12 @@
             background: white;
             border-radius: 12px;
             padding: 25px;
+            padding-top: 5px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
             height: 100%;
         }
         
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        }
         
         .stats-card .icon-wrapper {
             width: 60px;
@@ -116,22 +113,23 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        
+        .stats-card .imagen{
+            width: 60px;
+            height: 60px;
+        }
         .stats-card.income .icon-wrapper {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
+           
+            color: #11998e;
         }
         
         .stats-card.expense .icon-wrapper {
-            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-            color: white;
+           color:#ee0979;
         }
         
         .stats-card.savings .icon-wrapper {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color:#667eea;
         }
         
         .stats-card .title {
@@ -143,7 +141,7 @@
         }
         
         .stats-card .value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             display: block;
         }
@@ -154,7 +152,7 @@
         
         .quick-action-card {
             text-align: center;
-            padding: 30px 20px;
+            padding: 30px 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             height: 100%;
@@ -162,7 +160,7 @@
         }
         
         .quick-action-card:hover {
-            transform: translateY(-5px);
+            
             box-shadow: 0 8px 25px rgba(0,0,0,0.12);
             border-color: #3498db;
         }
@@ -175,7 +173,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            
         }
         
         .quick-action-card img {
@@ -200,7 +198,7 @@
             color: #2c3e50;
             font-weight: 600;
             margin-bottom: 20px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
         
         .tips-section {
@@ -283,6 +281,15 @@
             margin-bottom: 15px;
             opacity: 0.3;
         }
+        
+        .sidebar img{
+            width: 150px;
+        }
+        
+        .imagen{
+            width: 80px;
+            height: 80px;
+        }
     </style>
 </head>
 <body>
@@ -292,7 +299,7 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <h3><i class="fas fa-wallet"></i> Marnager</h3>
+    <h3><img src="${pageContext.request.contextPath}/assets/marnagerBlanco.png" alt="logoMarnager" /></i></h3>
     <a href="${pageContext.request.contextPath}/home" class="active">
         <i class="fas fa-home"></i> Inicio
     </a>
@@ -318,7 +325,7 @@
     <div class="container-fluid">
         <!-- Banner de Bienvenida -->
         <div class="welcome-banner">
-            <h1><i class="fas fa-hand-wave"></i> ¡Bienvenido, <c:out value="${sessionScope.usuario.email}" />!</h1>
+            <h1> ¡Bienvenido!</h1>
             <p>Tu asistente personal para gestionar tus finanzas de manera inteligente</p>
         </div>
 
@@ -330,8 +337,8 @@
                 <div class="row mb-4 g-4">
                     <div class="col-md-4">
                         <div class="stats-card income">
-                            <div class="icon-wrapper">
-                                <i class="fas fa-arrow-trend-up"></i>
+                            <div class="imagen">
+                                <img src="${pageContext.request.contextPath}/assets/moneyingresos.png" alt="ingresos" />
                             </div>
                             <span class="title">Ingresos Totales</span>
                             <span class="value">$0.00</span>
@@ -340,7 +347,7 @@
                     <div class="col-md-4">
                         <div class="stats-card expense">
                             <div class="icon-wrapper">
-                                <i class="fas fa-arrow-trend-down"></i>
+                                <img src="${pageContext.request.contextPath}/assets/moneygastos.png" alt="ingresos" />
                             </div>
                             <span class="title">Gastos Totales</span>
                             <span class="value">$0.00</span>

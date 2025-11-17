@@ -22,7 +22,7 @@
             left: 0;
             width: 260px;
             height: 100vh;
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            background-color: #3D38F5;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
@@ -185,6 +185,10 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+        
+        .sidebar img{
+            width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -194,7 +198,7 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <h3><i class="fas fa-wallet"></i> Marnager</h3>
+    <h3><img src="${pageContext.request.contextPath}/assets/marnagerBlanco.png" alt="logoMarnager" /></h3>
     <a href="${pageContext.request.contextPath}/home">
         <i class="fas fa-home"></i> Inicio
     </a>
