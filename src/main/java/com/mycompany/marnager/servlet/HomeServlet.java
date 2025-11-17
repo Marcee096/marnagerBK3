@@ -11,6 +11,8 @@ import com.mycompany.marnager.model.Ingreso;
 import com.mycompany.marnager.model.Usuario;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -98,6 +100,22 @@ public class HomeServlet extends HttpServlet {
         Map<String, BigDecimal> ahorrosMap = ahorrosMes.stream().collect(Collectors.groupingBy(Ahorro::getCategoria, Collectors.reducing(BigDecimal.ZERO, Ahorro::getMonto, BigDecimal::add)));
         request.setAttribute("ahorrosCategoriasJSON", gson.toJson(new ArrayList<>(ahorrosMap.keySet())));
         request.setAttribute("ahorrosDistribucionJSON", gson.toJson(new ArrayList<>(ahorrosMap.values())));
+        
+        // --- Preparar datos para el gráfico de promedios ---
+        int daysInMonth = now.withYear(selectedYear).withMonth(selectedMonth).lengthOfMonth();
+        if (daysInMonth > 0) {
+            BigDecimal days = new BigDecimal(daysInMonth);
+            MathContext mc = new MathContext(2, RoundingMode.HALF_UP);
+            BigDecimal avgIngresos = totalIngresos.divide(days, mc);
+            BigDecimal avgGastos = totalGastos.divide(days, mc);
+            BigDecimal avgAhorros = totalAhorros.divide(days, mc);
+
+            List<String> promedioLabels = List.of("Prom. Ingresos", "Prom. Gastos", "Prom. Ahorros");
+            List<BigDecimal> promedioData = List.of(avgIngresos, avgGastos, avgAhorros);
+
+            request.setAttribute("promedioLabelsJSON", gson.toJson(promedioLabels));
+            request.setAttribute("promedioDataJSON", gson.toJson(promedioData));
+        }
         
         // --- Lógica para Últimas Transacciones (del mes seleccionado) ---
         List<TransaccionDTO> transaccionesDelMes = new ArrayList<>();

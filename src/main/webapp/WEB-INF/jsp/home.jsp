@@ -96,7 +96,8 @@
         }
         .chart-container {
             position: relative;
-            height: 320px;
+            height: 300px;
+            margin-top:50px;
         }
         .empty-state {
             text-align: center;
@@ -180,7 +181,11 @@
 
         <!-- Gráficos -->
         <div class="card chart-card">
-            <h5 class="card-title">Análisis del Mes</h5>
+            <div class="row mt-4">
+    <!-- Gráfico circular (izquierda) -->
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <h5 class="card-title">Distribución del Mes</h5>
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#ingresos" type="button" role="tab" aria-controls="ingresos" aria-selected="true">
@@ -198,38 +203,32 @@
                     </button>
                 </li>
             </ul>
+
             <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="ingresos" role="tabpanel" aria-labelledby="ingresos-tab">
-                    <div class="chart-container">
-                        <c:choose>
-                            <c:when test="${not empty ingresosDistribucionJSON and ingresosDistribucionJSON ne '[]'}">
-                                <canvas id="ingresosChart"></canvas>
-                            </c:when>
-                            <c:otherwise><div class="empty-state"><i class="fas fa-chart-pie"></i><p>No hay datos de ingresos este mes.</p></div></c:otherwise>
-                        </c:choose>
-                    </div>
+                <div class="tab-pane fade show active chart-container" id="ingresos">
+                    <canvas id="ingresosChart"></canvas>
                 </div>
-                <div class="tab-pane fade" id="gastos" role="tabpanel" aria-labelledby="gastos-tab">
-                    <div class="chart-container">
-                        <c:choose>
-                            <c:when test="${not empty gastosDistribucionJSON and gastosDistribucionJSON ne '[]'}">
-                                <canvas id="gastosChart"></canvas>
-                            </c:when>
-                            <c:otherwise><div class="empty-state"><i class="fas fa-chart-pie"></i><p>No hay datos de gastos este mes.</p></div></c:otherwise>
-                        </c:choose>
-                    </div>
+                <div class="tab-pane fade chart-container" id="gastos">
+                    <canvas id="gastosChart"></canvas>
                 </div>
-                <div class="tab-pane fade" id="ahorros" role="tabpanel" aria-labelledby="ahorros-tab">
-                    <div class="chart-container">
-                        <c:choose>
-                            <c:when test="${not empty ahorrosDistribucionJSON and ahorrosDistribucionJSON ne '[]'}">
-                                <canvas id="ahorrosChart"></canvas>
-                            </c:when>
-                            <c:otherwise><div class="empty-state"><i class="fas fa-chart-pie"></i><p>No hay datos de ahorros este mes.</p></div></c:otherwise>
-                        </c:choose>
-                    </div>
+                <div class="tab-pane fade chart-container" id="ahorros">
+                    <canvas id="ahorrosChart"></canvas>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Gráfico barras comparativas (derecha) -->
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <h5 class="card-title">Promedio registros mensuales</h5>
+            <div class="chart-container">
+                <canvas id="comparativoChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
         </div>
 
         <!-- Últimas transacciones -->
@@ -346,6 +345,57 @@
     // Gráfico de Ahorros
     <c:if test="${not empty ahorrosDistribucionJSON and ahorrosDistribucionJSON ne '[]'}">
         createDoughnutChart('ahorrosChart', ${ahorrosCategoriasJSON}, ${ahorrosDistribucionJSON}, ['#3498db', '#2980b9', '#9b59b6', '#8e44ad', '#5dade2']);
+    </c:if>
+
+    function createBarChart(canvasId, labels, data) {
+        const canvas = document.getElementById(canvasId);
+        if (canvas) {
+            new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Promedio Diario',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(46, 204, 113, 0.6)',
+                            'rgba(231, 76, 60, 0.6)',
+                            'rgba(52, 152, 219, 0.6)'
+                        ],
+                        borderColor: [
+                            '#2ecc71',
+                            '#e74c3c',
+                            '#3498db'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Gráfico de Promedios
+    <c:if test="${not empty promedioDataJSON and promedioDataJSON ne '[]'}">
+        createBarChart('comparativoChart', ${promedioLabelsJSON}, ${promedioDataJSON});
     </c:if>
 </script>
 </body>
