@@ -2,6 +2,8 @@ package com.mycompany.marnager.servlet;
 
 import com.google.gson.Gson;
 import com.mycompany.marnager.ejb.IngresoFacade;
+import com.mycompany.marnager.ejb.GastoFacade;
+import com.mycompany.marnager.ejb.AhorroFacade;
 import com.mycompany.marnager.model.Ingreso;
 import com.mycompany.marnager.model.Usuario;
 import java.io.IOException;
@@ -21,11 +23,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+
 @WebServlet(name = "IngresosServlet", urlPatterns = {"/ingresos"})
 public class IngresosServlet extends HttpServlet {
 
-    @EJB
-    private IngresoFacade ingresoFacade;
+    @EJB private IngresoFacade ingresoFacade;
+    @EJB private GastoFacade gastoFacade;
+    @EJB private AhorroFacade ahorroFacade;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,6 +54,18 @@ public class IngresosServlet extends HttpServlet {
             selectedYear = now.getYear();
             selectedMonth = now.getMonthValue();
         }
+        
+        // --- Calcular Saldo Anterior dinámicamente ---
+        LocalDate fechaInicioMes = LocalDate.of(selectedYear, selectedMonth, 1);
+        java.util.Date fechaParaConsulta = java.util.Date.from(fechaInicioMes.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
+
+        BigDecimal ingresosAnteriores = ingresoFacade.getSumaTotalHastaFecha(usuario, fechaParaConsulta);
+        BigDecimal gastosAnteriores = gastoFacade.getSumaTotalHastaFecha(usuario, fechaParaConsulta);
+        BigDecimal ahorrosAnteriores = ahorroFacade.getSumaTotalHastaFecha(usuario, fechaParaConsulta);
+
+        BigDecimal saldoAnterior = ingresosAnteriores
+                                             .subtract(gastosAnteriores)
+                                             .subtract(ahorrosAnteriores);
 
         List<Map<String, String>> monthOptions = new ArrayList<>();
         Locale spanishLocale = new Locale("es", "ES");
@@ -64,7 +80,10 @@ public class IngresosServlet extends HttpServlet {
             ));
         }
 
-        List<Ingreso> listaIngresos = ingresoFacade.findByUserAndMonth(usuario, selectedYear, selectedMonth);
+        List<Ingreso> listaIngresos = ingresoFacade.findByUserAndMonth(usuario, selectedYear, selectedMonth)
+                .stream()
+                .filter(i -> !"Saldo Mes Anterior".equals(i.getCategoria()))
+                .collect(Collectors.toList());
 
         Map<String, BigDecimal> distribucionMap = listaIngresos.stream()
                 .collect(Collectors.groupingBy(Ingreso::getCategoria,
@@ -74,6 +93,7 @@ public class IngresosServlet extends HttpServlet {
         List<String> labelsDistribucion = new ArrayList<>(distribucionMap.keySet());
         List<BigDecimal> dataDistribucion = new ArrayList<>(distribucionMap.values());
 
+        request.setAttribute("saldoAnterior", saldoAnterior);
         request.setAttribute("ingresos", listaIngresos);
         request.setAttribute("selectedYear", selectedYear);
         request.setAttribute("selectedMonth", selectedMonth);

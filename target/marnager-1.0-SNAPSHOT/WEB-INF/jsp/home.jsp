@@ -160,6 +160,14 @@
         <!-- Tarjetas de Resumen Mensual -->
         <div class="row mb-4 g-4">
             <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="title">Saldo Anterior</div>
+                    <div class="value <c:if test='${saldoAnterior < 0}'>text-danger</c:if>">
+                        <fmt:formatNumber value="${saldoAnterior}" type="currency" currencySymbol="$" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="stats-card income">
                     <div class="title">Ingresos del Mes</div>
                     <div class="value"><fmt:formatNumber value="${totalIngresos}" type="currency" currencySymbol="$" /></div>
@@ -172,16 +180,18 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stats-card savings">
-                    <div class="title">Ahorros del Mes</div>
-                    <div class="value"><fmt:formatNumber value="${totalAhorros}" type="currency" currencySymbol="$" /></div>
-                </div>
-            </div>
-            <div class="col-md-3">
                 <div class="stats-card">
-                    <div class="title">Saldo Disponible (I - G - A)</div>
-                    <div class="value <c:if test='${saldoDisponible < 0}'>text-danger</c:if>">
-                        <fmt:formatNumber value="${saldoDisponible}" type="currency" currencySymbol="$" />
+                    <div class="title">Balance del Mes</div>
+                    <div class="value <c:if test='${saldoDisponible + totalAhorros < 0}'>text-danger</c:if>">
+                        <fmt:formatNumber value="${saldoDisponible + totalAhorros}" type="currency" currencySymbol="$" />
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted d-block">
+                            Disponible: <strong class="<c:if test='${saldoDisponible < 0}'>text-danger</c:if>"><fmt:formatNumber value="${saldoDisponible}" type="currency" currencySymbol="$" /></strong>
+                        </small>
+                        <small class="text-muted d-block">
+                            Ahorrado: <strong class="text-info"><fmt:formatNumber value="${totalAhorros}" type="currency" currencySymbol="$" /></strong>
+                        </small>
                     </div>
                 </div>
             </div>

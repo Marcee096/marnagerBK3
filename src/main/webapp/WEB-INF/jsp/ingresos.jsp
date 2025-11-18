@@ -172,6 +172,20 @@
             </div>
         </div>
 
+        <!-- Tarjeta de Saldo Anterior -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Saldo al inicio del mes (arrastre):</h5>
+                        <span class="fs-4 fw-bold <c:if test='${saldoAnterior < 0}'>text-danger</c:if>">
+                            <fmt:formatNumber value="${saldoAnterior}" type="currency" currencySymbol="$" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <c:if test="${not empty status}">
             <div class="alert alert-${status == 'created' || status == 'updated' ? 'success' : (status == 'deleted' ? 'info' : 'danger')} alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle"></i>

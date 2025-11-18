@@ -54,4 +54,12 @@ public class IngresoFacade extends AbstractFacade<Ingreso> {
         query.setParameter("endDate", endDate);
         return query.getResultList();
     }
+    
+    public java.math.BigDecimal getSumaTotalHastaFecha(Usuario usuario, Date fecha) {
+        TypedQuery<java.math.BigDecimal> query = em.createQuery(
+            "SELECT COALESCE(SUM(i.monto), 0.0) FROM Ingreso i WHERE i.usuario = :usuario AND i.fecha < :fecha", java.math.BigDecimal.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("fecha", fecha);
+        return query.getSingleResult();
+    }
 }

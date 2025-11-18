@@ -333,7 +333,7 @@
                         <label for="edit-categoria" class="form-label">Categoría</label>
                         <select class="form-select" id="edit-categoria" name="categoria" required>
                             <option value="Vivienda">Vivienda</option>
-                            <option value="Alimentación">Alimentación</option>
+                            <option value="Alimentacion">Alimentación</option>
                             <option value="Transporte">Transporte</option>
                             <option value="Ocio">Ocio</option>
                             <option value="Salud">Salud</option>
