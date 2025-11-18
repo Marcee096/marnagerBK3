@@ -159,22 +159,30 @@
 
         <!-- Tarjetas de Resumen Mensual -->
         <div class="row mb-4 g-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card income">
                     <div class="title">Ingresos del Mes</div>
                     <div class="value"><fmt:formatNumber value="${totalIngresos}" type="currency" currencySymbol="$" /></div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card expense">
                     <div class="title">Gastos del Mes</div>
                     <div class="value"><fmt:formatNumber value="${totalGastos}" type="currency" currencySymbol="$" /></div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card savings">
                     <div class="title">Ahorros del Mes</div>
                     <div class="value"><fmt:formatNumber value="${totalAhorros}" type="currency" currencySymbol="$" /></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="title">Saldo Disponible (I - G - A)</div>
+                    <div class="value <c:if test='${saldoDisponible < 0}'>text-danger</c:if>">
+                        <fmt:formatNumber value="${saldoDisponible}" type="currency" currencySymbol="$" />
+                    </div>
                 </div>
             </div>
         </div>

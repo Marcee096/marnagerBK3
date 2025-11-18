@@ -14,8 +14,11 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,6 +50,9 @@ public class HomeServlet extends HttpServlet {
         
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         
+        // --- Lógica de Arrastre de Saldo (Rollover) ---
+        handleSaldoArrastre(usuario);
+
         // --- Lógica de Filtro de Mes/Año ---
         LocalDate now = LocalDate.now();
         int selectedYear;
@@ -78,31 +84,29 @@ public class HomeServlet extends HttpServlet {
         List<Gasto> gastosMes = gastoFacade.findByUserAndMonth(usuario, selectedYear, selectedMonth);
         List<Ahorro> ahorrosMes = ahorroFacade.findByUserAndMonth(usuario, selectedYear, selectedMonth);
         
-        // --- Calcular totales para el mes seleccionado ---
+        // --- Calcular totales y saldo disponible para el mes seleccionado ---
         BigDecimal totalIngresos = ingresosMes.stream().map(Ingreso::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalGastos = gastosMes.stream().map(Gasto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalAhorros = ahorrosMes.stream().map(Ahorro::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal saldoDisponible = totalIngresos.subtract(totalGastos).subtract(totalAhorros);
 
         // --- Preparar datos para los 3 gráficos de distribución ---
         Gson gson = new Gson();
         
-        // Gráfico de Ingresos
         Map<String, BigDecimal> ingresosMap = ingresosMes.stream().collect(Collectors.groupingBy(Ingreso::getCategoria, Collectors.reducing(BigDecimal.ZERO, Ingreso::getMonto, BigDecimal::add)));
         request.setAttribute("ingresosCategoriasJSON", gson.toJson(new ArrayList<>(ingresosMap.keySet())));
         request.setAttribute("ingresosDistribucionJSON", gson.toJson(new ArrayList<>(ingresosMap.values())));
 
-        // Gráfico de Gastos
         Map<String, BigDecimal> gastosMap = gastosMes.stream().collect(Collectors.groupingBy(Gasto::getCategoria, Collectors.reducing(BigDecimal.ZERO, Gasto::getMonto, BigDecimal::add)));
         request.setAttribute("gastosCategoriasJSON", gson.toJson(new ArrayList<>(gastosMap.keySet())));
         request.setAttribute("gastosDistribucionJSON", gson.toJson(new ArrayList<>(gastosMap.values())));
 
-        // Gráfico de Ahorros
         Map<String, BigDecimal> ahorrosMap = ahorrosMes.stream().collect(Collectors.groupingBy(Ahorro::getCategoria, Collectors.reducing(BigDecimal.ZERO, Ahorro::getMonto, BigDecimal::add)));
         request.setAttribute("ahorrosCategoriasJSON", gson.toJson(new ArrayList<>(ahorrosMap.keySet())));
         request.setAttribute("ahorrosDistribucionJSON", gson.toJson(new ArrayList<>(ahorrosMap.values())));
         
         // --- Preparar datos para el gráfico de promedios ---
-        int daysInMonth = now.withYear(selectedYear).withMonth(selectedMonth).lengthOfMonth();
+        int daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth();
         if (daysInMonth > 0) {
             BigDecimal days = new BigDecimal(daysInMonth);
             MathContext mc = new MathContext(2, RoundingMode.HALF_UP);
@@ -129,12 +133,56 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("totalIngresos", totalIngresos);
         request.setAttribute("totalGastos", totalGastos);
         request.setAttribute("totalAhorros", totalAhorros);
+        request.setAttribute("saldoDisponible", saldoDisponible);
         request.setAttribute("ultimasTransacciones", ultimasTransacciones);
         request.setAttribute("selectedYear", selectedYear);
         request.setAttribute("selectedMonth", selectedMonth);
         request.setAttribute("monthOptions", monthOptions);
         
         request.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(request, response);
+    }
+    
+    private void handleSaldoArrastre(Usuario usuario) {
+        LocalDate hoy = LocalDate.now();
+        int anhoActual = hoy.getYear();
+        int mesActual = hoy.getMonthValue();
+
+        // 1. Verificar si el arrastre para este mes ya se hizo
+        boolean yaHecho = ingresoFacade.findByUserAndMonth(usuario, anhoActual, mesActual).stream()
+                .anyMatch(i -> "Saldo Mes Anterior".equals(i.getCategoria()));
+
+        if (!yaHecho) {
+            // 2. Calcular mes anterior
+            LocalDate mesAnteriorDate = hoy.minusMonths(1);
+            int anhoAnterior = mesAnteriorDate.getYear();
+            int mesAnterior = mesAnteriorDate.getMonthValue();
+
+            // 3. Calcular saldo del mes anterior
+            List<Ingreso> ingresosMesAnt = ingresoFacade.findByUserAndMonth(usuario, anhoAnterior, mesAnterior);
+            List<Gasto> gastosMesAnt = gastoFacade.findByUserAndMonth(usuario, anhoAnterior, mesAnterior);
+            List<Ahorro> ahorrosMesAnt = ahorroFacade.findByUserAndMonth(usuario, anhoAnterior, mesAnterior);
+
+            BigDecimal totalIngresosAnt = ingresosMesAnt.stream().map(Ingreso::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalGastosAnt = gastosMesAnt.stream().map(Gasto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalAhorrosAnt = ahorrosMesAnt.stream().map(Ahorro::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+            BigDecimal saldoAnterior = totalIngresosAnt.subtract(totalGastosAnt).subtract(totalAhorrosAnt);
+
+            // 4. Si el saldo es positivo, crear el nuevo ingreso
+            if (saldoAnterior.compareTo(BigDecimal.ZERO) > 0) {
+                Ingreso ingresoArrastre = new Ingreso();
+                ingresoArrastre.setUsuario(usuario);
+                ingresoArrastre.setCategoria("Saldo Mes Anterior");
+                ingresoArrastre.setSubcategoria("Arrastre automático");
+                ingresoArrastre.setMonto(saldoAnterior);
+                
+                // Fecha al primer día del mes actual
+                LocalDate primerDiaMesActual = hoy.withDayOfMonth(1);
+                ingresoArrastre.setFecha(Date.from(primerDiaMesActual.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                
+                ingresoFacade.create(ingresoArrastre);
+            }
+        }
     }
 
     @Override

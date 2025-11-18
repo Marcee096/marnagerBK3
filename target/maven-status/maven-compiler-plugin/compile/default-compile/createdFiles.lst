@@ -17,3 +17,4 @@ com\mycompany\marnager\servlet\GastosServlet.class
 com\mycompany\marnager\model\Usuario.class
 com\mycompany\marnager\servlet\HomeServlet.class
 com\mycompany\marnager\servlet\RegisterServlet.class
+com\mycompany\marnager\model\ArrastreSaldo.class
